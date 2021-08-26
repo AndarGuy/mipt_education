@@ -7,14 +7,19 @@
 // specify a current verion
 #define VERSION "1.0"
 
-// check if char is a number
-bool isNumber(char number) {
-    return '0' <= number && number <= '9';
-}
-
 // function which will be implemented in future update
 int getPower(int pointer, char equation[]) {
     return 0;
+}
+
+// function which will be implemented in future update
+bool checkDouble(char buffer[], char pointer) {
+    return true;
+}
+
+// check if char is a number
+bool isNumber(char number) {
+    return '0' <= number && number <= '9';
 }
 
 // parse incomplete buffer string to double without pain
@@ -25,12 +30,7 @@ double parseDouble(char buffer[], char pointer) {
     return atof(temp);
 }
 
-bool checkDouble(char buffer[], char pointer) {
-//    for (int i = 0; i < pointer + 1; i++) if (!isNumber(buffer[i]) && !buffer[i] == '.' && );
-    return true;
-}
-
-// gets the sum of simple summands such as -2, 2.5, 90
+// gets the sums of summands such as -2x, 2.5, 90x^2
 double* getSummands(char equation[], char variable) {
     // in this array we will store sums for different types of summands {simple: 90, linear: 2.5x, quadratic: -2x^2}
     static double sums[] = {0, 0, 0};
@@ -118,6 +118,21 @@ bool isAnySolution(double a, double b, double c) {
     return a == 0 && b == 0 && c == 0;
 }
 
+double getDiscriminant(double a, double b, double c) {
+    return pow(b, 2) - 4 * a * c;
+}
+
+double getLinearSolution(double b, double c) {
+    return c / -b;
+}
+
+double* getQuadraticSolutions(double a, double b, double discriminant) {
+    static double solutions[2];
+    solutions[0] = (-b + pow(discriminant, 0.5)) / (2 * a);
+    solutions[1] = (-b - pow(discriminant, 0.5)) / (2 * a);
+    return solutions;
+}
+
 int main() {
     const char DEFAULT_VARIABLE = 'x';
     
@@ -145,7 +160,7 @@ int main() {
     
     char equation[64];
     scanf("%[^\n]", equation);
-    double* summands = getSummands(equation, 'x');
+    double* summands = getSummands(equation, variable);
     
     // parameters for equation ax^2 + bx + c = 0
     double c = *(summands + 0), b = *(summands + 1), a = *(summands + 2);
@@ -154,22 +169,25 @@ int main() {
         if (!isAnySolution(a, b, c)) {
             // check if it is linear equation
             if (a == 0) {
-                printf(ONE_SOLUTION, variable, c / -b);
+                printf(ONE_SOLUTION, variable, getLinearSolution(b, c));
                 putchar('\n');
             }
             else {
                 // get the discriminant with magic formula: D = b^2 - 4ac
-                const double discriminant = pow(b, 2) - 4 * a * c;
+                const double discriminant = getDiscriminant(a, b, c);
                 if (discriminant > 0) {
                     // if equation has two solutions
-                    printf(TWO_SOLUTIONS, variable, (-b + pow(discriminant, 0.5)) / (2 * a), variable, (-b - pow(discriminant, 0.5)) / (2 * a));
+                    double* solutions = getQuadraticSolutions(a, b, discriminant);
+                    double solution1 = *(solutions + 0), solution2 = *(solutions + 1);
+                    printf(TWO_SOLUTIONS, variable, solution1, variable, solution2);
                     putchar('\n');
                 } else if (discriminant < 0) {
                     // if equation has no solutions
                     puts(NO_SOLUTION);
                 } else {
                     // if equation has one solutions
-                    printf(ONE_SOLUTION, variable, -b / (2 * a));
+                    double solution = *(getQuadraticSolutions(a, b, discriminant) + 0);
+                    printf(ONE_SOLUTION, variable, solution);
                     putchar('\n');
                 }
             }
