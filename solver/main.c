@@ -238,15 +238,16 @@ void getQuadraticSolutions(double a, double b, double discriminant, double solut
 
 int selectInputMethod(void) {
     while (true) {
-        puts(SELECT_INPUT_METHOD);
+        printf(SELECT_INPUT_METHOD);
         int input;
-        scanf("%d", &input);
-        getchar();
-        if (input == INPUT_METHOD_SIMPLIFIED || input == INPUT_METHOD_PRETTIFIED) {
-            return input;
-        } else {
-            puts("Unknown input value.\n");
+        if (scanf("%d", &input)) {
+            if (input == INPUT_METHOD_SIMPLIFIED || input == INPUT_METHOD_PRETTIFIED) {
+                return input;
+            } else {
+                 printf("Unknown input value.\n");
+            }
         }
+        getchar();
     }
     return 0;
 }
